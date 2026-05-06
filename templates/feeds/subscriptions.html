@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load feed_extras %}
+
+{% block title %}订阅 - SoloFeed{% endblock %}
+{% block tab_subs %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if subscriptions %}
+        {% regroup subscriptions by platform as platform_groups %}
+        {% for group in platform_groups %}
+        <h6 class="text-muted mt-3 mb-2">{{ group.grouper|platform_label }} ({{ group.list|length }})</h6>
+        {% for sub in group.list %}
+        <div class="card mb-2">
+            <div class="card-body d-flex align-items-center py-2">
+                <img src="{{ sub.creator_avatar }}" class="rounded-circle me-3"
+                     width="40" height="40" alt="{{ sub.creator_name }}"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><rect fill=%22%23eee%22 width=%2240%22 height=%2240%22/></svg>'">
+                <div class="flex-grow-1">
+                    <strong>{{ sub.creator_name }}</strong>
+                    <br>
+                    <small class="text-muted">{{ sub.creator_desc|default:"暂无简介"|truncatechars:30 }}</small>
+                </div>
+                <span class="badge" style="background-color: {{ sub.platform|platform_color }}">{{ sub.platform|platform_label }}</span>
+                <button class="btn btn-sm btn-outline-danger ms-2" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal" data-id="{{ sub.id }}" data-name="{{ sub.creator_name }}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-bookmark" style="font-size:3rem;color:#ccc;"></i>
+            <p class="text-muted mt-3">暂无订阅</p>
+            <a href="{% url 'discover' %}" class="btn btn-dark mt-2">去发现</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 删除确认 Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <p>确定取消关注 <strong id="delete-name"></strong>？</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form method="post" id="delete-form" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">确定</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    const modal = document.getElementById('deleteModal');
+    const deleteForm = document.getElementById('delete-form');
+    const deleteName = document.getElementById('delete-name');
+
+    modal.addEventListener('show.bs.modal', function(event) {
+        const btn = event.relatedTarget;
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        deleteForm.action = '/subscriptions/' + id + '/delete/';
+        deleteName.textContent = name;
+    });
+})();
+</script>
+{% endblock %}

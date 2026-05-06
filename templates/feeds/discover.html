@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load feed_extras %}
+
+{% block title %}发现 - SoloFeed{% endblock %}
+{% block tab_discover %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="get" action="{% url 'discover' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control form-control-lg" name="keyword"
+                   placeholder="搜索B站UP主" value="{{ keyword }}" required>
+            <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i> 搜索</button>
+        </div>
+    </form>
+
+    {% if keyword %}
+        {% if creators %}
+            {% for creator in creators %}
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    <img src="{{ creator.creator_avatar }}" class="rounded-circle me-3"
+                         width="50" height="50" alt="{{ creator.creator_name }}"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22><rect fill=%22%23eee%22 width=%2250%22 height=%2250%22/></svg>'">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <strong>{{ creator.creator_name }}</strong>
+                            <span class="badge" style="background-color: #00A1D6">B站</span>
+                        </div>
+                        <small class="text-muted text-truncate d-block" style="max-width:200px;">{{ creator.creator_desc|default:"暂无简介" }}</small>
+                        {% if creator.stats %}
+                        <small class="text-muted">
+                            {{ creator.stats.fans|fans_count }}粉丝 · {{ creator.stats.videos }}个视频
+                        </small>
+                        {% endif %}
+                    </div>
+                    {% if creator.creator_id in user_sub_ids %}
+                    <button class="btn btn-sm btn-outline-secondary" disabled>已关注</button>
+                    {% else %}
+                    <form method="post" action="{% url 'subscription_add' %}" class="ms-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="platform" value="{{ creator.platform }}">
+                        <input type="hidden" name="creator_id" value="{{ creator.creator_id }}">
+                        <input type="hidden" name="creator_name" value="{{ creator.creator_name }}">
+                        <input type="hidden" name="creator_avatar" value="{{ creator.creator_avatar }}">
+                        <input type="hidden" name="creator_desc" value="{{ creator.creator_desc }}">
+                        <input type="hidden" name="rsshub_route" value="{{ creator.rsshub_route }}">
+                        <button type="submit" class="btn btn-sm btn-dark">关注</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-search" style="font-size:3rem;color:#ccc;"></i>
+                <p class="text-muted mt-3">未找到相关UP主</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-search" style="font-size:3rem;color:#ccc;"></i>
+            <p class="text-muted mt-3">搜索B站UP主</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
