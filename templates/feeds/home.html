@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load feed_extras %}
+
+{% block title %}SoloFeed{% endblock %}
+{% block tab_home %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 平台筛选 -->
+    <ul class="nav nav-pills mb-3" id="platform-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if not current_platform %}active{% endif %}" href="/">全部</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if current_platform == 'bilibili' %}active{% endif %}" href="/?platform=bilibili">B站</a>
+        </li>
+    </ul>
+
+    <!-- Entry 列表 -->
+    <div id="entries-container">
+        {% if entries %}
+            {% include "feeds/partials/entry_cards.html" %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size:3rem;color:#ccc;"></i>
+                <p class="text-muted mt-3">暂无内容</p>
+                {% if sub_count == 0 %}
+                <a href="{% url 'discover' %}" class="btn btn-dark mt-2">去发现</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 加载更多 -->
+    <div id="scroll-sentinel" class="text-center py-3"
+         data-has-more="{{ has_more|yesno:'true,false' }}"
+         data-next-cursor="{{ next_cursor }}"
+         data-platform="{{ current_platform }}">
+        {% if has_more %}
+        <div class="spinner-border spinner-border-sm text-secondary" role="status">
+            <span class="visually-hidden">加载中...</span>
+        </div>
+        {% elif entries %}
+        <small class="text-muted">没有更多了</small>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    const sentinel = document.getElementById('scroll-sentinel');
+    const container = document.getElementById('entries-container');
+    if (!sentinel || sentinel.dataset.hasMore !== 'true') return;
+
+    const observer = new IntersectionObserver(function(entries) {
+        if (!entries[0].isIntersecting) return;
+        loadMore();
+    }, { rootMargin: '200px' });
+
+    observer.observe(sentinel);
+
+    async function loadMore() {
+        const cursor = sentinel.dataset.nextCursor;
+        const platform = sentinel.dataset.platform;
+        if (!cursor) return;
+
+        sentinel.innerHTML = '<div class="spinner-border spinner-border-sm text-secondary" role="status"><span class="visually-hidden">加载中...</span></div>';
+
+        try {
+            const url = '/entries/load-more/?cursor=' + encodeURIComponent(cursor);
+            if (platform) url += '&platform=' + encodeURIComponent(platform);
+            const resp = await fetch(url);
+            const html = await resp.text();
+            container.insertAdjacentHTML('beforeend', html);
+
+            const newSentinel = html.match(/data-has-more="(\w+)"/);
+            const newCursor = html.match(/data-next-cursor="([^"]*)"/);
+            if (newSentinel && newSentinel[1] === 'true' && newCursor) {
+                sentinel.dataset.nextCursor = newCursor[1];
+                sentinel.innerHTML = '<div class="spinner-border spinner-border-sm text-secondary" role="status"></div>';
+            } else {
+                sentinel.innerHTML = '<small class="text-muted">没有更多了</small>';
+                observer.disconnect();
+            }
+        } catch (e) {
+            sentinel.innerHTML = '<small class="text-danger">加载失败</small>';
+        }
+    }
+})();
+</script>
+{% endblock %}

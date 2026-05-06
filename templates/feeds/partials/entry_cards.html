@@ -1,0 +1,28 @@
+{% load feed_extras %}
+{% for entry in entries %}
+<div class="card mb-3 entry-card" onclick="window.open('{{ entry.link }}', '_blank')">
+    <div class="row g-0">
+        {% if entry.cover_image %}
+        <div class="col-4 col-md-3">
+            <img src="{{ entry.cover_image }}" class="img-fluid rounded-start entry-cover" alt="{{ entry.title }}" loading="lazy">
+        </div>
+        <div class="col-8 col-md-9">
+        {% else %}
+        <div class="col-12">
+        {% endif %}
+            <div class="card-body py-2 px-3">
+                <h6 class="card-title mb-1 entry-title">{{ entry.title }}</h6>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                    <span class="badge" style="background-color: {{ entry.platform|platform_color }}">{{ entry.platform|platform_label }}</span>
+                    <small class="text-muted">{{ entry.subscription.creator_name }}</small>
+                    <small class="text-muted ms-auto">{{ entry.pub_date|relative_time }}</small>
+                </div>
+            </div>
+        {% if entry.cover_image %}
+        </div>
+        {% else %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}

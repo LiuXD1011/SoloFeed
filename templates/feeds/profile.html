@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load feed_extras %}
+
+{% block title %}我的 - SoloFeed{% endblock %}
+{% block tab_profile %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 用户信息 -->
+    <div class="text-center py-4">
+        <div class="avatar-circle mx-auto mb-3">
+            {{ user.nickname|default:user.phone|first }}
+        </div>
+        <h5>{{ user.nickname|default:"未设置昵称" }}</h5>
+        <small class="text-muted">{{ user.phone|masked_phone }}</small>
+    </div>
+
+    <!-- 统计 -->
+    <div class="row text-center mb-4">
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body py-3">
+                    <h5>{{ sub_count }}</h5>
+                    <small class="text-muted">关注</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body py-3">
+                    <h5>{{ starred_count }}</h5>
+                    <small class="text-muted">收藏</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body py-3">
+                    <h5>{{ read_count }}</h5>
+                    <small class="text-muted">已读</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置列表 -->
+    <div class="list-group mb-4">
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-info-circle me-2"></i>关于 SoloFeed</span>
+            <small class="text-muted">v1.0</small>
+        </div>
+        <a href="#" class="list-group-item d-flex justify-content-between align-items-center"
+           onclick="alert('缓存已清除'); return false;">
+            <span><i class="bi bi-arrow-clockwise me-2"></i>清除缓存</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+        </a>
+    </div>
+
+    <!-- 退出登录 -->
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger w-100">退出登录</button>
+    </form>
+</div>
+{% endblock %}
