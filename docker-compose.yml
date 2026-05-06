@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  # SoloFeed 后端依赖
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: solofeed
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  # RSSHub 实例
+  rsshub:
+    image: diygod/rsshub:latest
+    restart: unless-stopped
+    ports:
+      - "1200:1200"
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: memory
+      CACHE_EXPIRE: 300
+      CACHE_CONTENT_EXPIRE: 3600
+      ACCESS_KEY: ""  # 可设置访问密钥
+      # Bilibili 配置（可选）
+      BILIBILI_COOKIE: ""
+    depends_on:
+      - redis
+
+volumes:
+  pgdata:
