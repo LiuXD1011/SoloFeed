@@ -6,16 +6,17 @@
 
 ## 技术栈
 
-| 层级 | 技术 | 说明 |
-|------|------|------|
-| 客户端 | uni-app + Vue 3 + TypeScript | 一套代码编译为微信小程序、H5、APP |
-| 状态管理 | Pinia | 轻量、类型安全 |
-| 后端 | Hono + TypeScript | 轻量高性能 Web 框架 |
-| ORM | Drizzle ORM | 类型安全的 SQL 查询构建器 |
-| 数据库 | PostgreSQL 16 | 用户、订阅、条目存储 |
-| 缓存 | Redis 7 | Feed 缓存、会话管理 |
-| 数据源 | RSSHub (Docker) | 将各平台内容转换为标准 RSS |
-| 认证 | JWT + 短信验证码 | 手机号无密码登录 |
+
+| 层级     | 技术                         | 说明                              |
+| -------- | ---------------------------- | --------------------------------- |
+| 客户端   | uni-app + Vue 3 + TypeScript | 一套代码编译为微信小程序、H5、APP |
+| 状态管理 | Pinia                        | 轻量、类型安全                    |
+| 后端     | Hono + TypeScript            | 轻量高性能 Web 框架               |
+| ORM      | Drizzle ORM                  | 类型安全的 SQL 查询构建器         |
+| 数据库   | PostgreSQL 16                | 用户、订阅、条目存储              |
+| 缓存     | Redis 7                      | Feed 缓存、会话管理               |
+| 数据源   | RSSHub (Docker)              | 将各平台内容转换为标准 RSS        |
+| 认证     | JWT + 短信验证码             | 手机号无密码登录                  |
 
 ## 整体架构
 
@@ -159,18 +160,19 @@ SoloFeed/
 
 ## API 接口一览
 
-| 方法 | 端点 | 说明 | 认证 |
-|------|------|------|------|
-| POST | `/api/auth/send-code` | 发送短信验证码 | 否 |
-| POST | `/api/auth/login` | 验证码登录/注册，返回 JWT | 否 |
-| POST | `/api/auth/refresh` | 刷新 Token | Bearer |
-| GET | `/api/creators/search?keyword=` | 搜索B站UP主 | Bearer |
-| GET | `/api/creators/:platform/:id` | 获取博主详情 | Bearer |
-| GET | `/api/subscriptions` | 获取我的订阅列表 | Bearer |
-| POST | `/api/subscriptions` | 添加订阅 | Bearer |
-| DELETE | `/api/subscriptions/:id` | 取消订阅 | Bearer |
-| GET | `/api/entries?limit=&cursor=&platform=` | 信息流（游标分页） | Bearer |
-| POST | `/api/entries/refresh/:subscriptionId` | 手动拉取最新内容 | Bearer |
+
+| 方法   | 端点                                    | 说明                      | 认证   |
+| ------ | --------------------------------------- | ------------------------- | ------ |
+| POST   | `/api/auth/send-code`                   | 发送短信验证码            | 否     |
+| POST   | `/api/auth/login`                       | 验证码登录/注册，返回 JWT | 否     |
+| POST   | `/api/auth/refresh`                     | 刷新 Token                | Bearer |
+| GET    | `/api/creators/search?keyword=`         | 搜索B站UP主               | Bearer |
+| GET    | `/api/creators/:platform/:id`           | 获取博主详情              | Bearer |
+| GET    | `/api/subscriptions`                    | 获取我的订阅列表          | Bearer |
+| POST   | `/api/subscriptions`                    | 添加订阅                  | Bearer |
+| DELETE | `/api/subscriptions/:id`                | 取消订阅                  | Bearer |
+| GET    | `/api/entries?limit=&cursor=&platform=` | 信息流（游标分页）        | Bearer |
+| POST   | `/api/entries/refresh/:subscriptionId`  | 手动拉取最新内容          | Bearer |
 
 ## 快速开始
 
@@ -190,11 +192,12 @@ docker compose up -d
 
 这会启动三个服务：
 
-| 服务 | 端口 | 说明 |
-|------|------|------|
-| PostgreSQL | 5432 | 主数据库 |
-| Redis | 6379 | 缓存 |
-| RSSHub | 1200 | Feed 数据源 |
+
+| 服务       | 端口 | 说明        |
+| ---------- | ---- | ----------- |
+| PostgreSQL | 5432 | 主数据库    |
+| Redis      | 6379 | 缓存        |
+| RSSHub     | 1200 | Feed 数据源 |
 
 验证 RSSHub：浏览器访问 `http://localhost:1200/bilibili/user/dynamic/946974`
 
@@ -240,61 +243,65 @@ pnpm dev:mp-weixin
 
 ### 第一阶段 — 基础骨架 + B站阅读 (MVP) 当前阶段
 
-| 模块 | 功能 | 状态 |
-|------|------|------|
-| **后端** | Hono 项目骨架、中间件 (Auth/CORS/Error) | 已完成 |
-| **后端** | 数据库 Schema (5 张表) + Drizzle ORM | 已完成 |
-| **后端** | 短信验证码登录 / JWT 认证 | 已完成 |
-| **后端** | 订阅 CRUD (增/删/查) | 已完成 |
-| **后端** | 信息流查询 (游标分页) + 手动刷新 | 已完成 |
-| **后端** | 博主搜索 (代理B站 API) + 博主详情 | 已完成 |
-| **后端** | RSSHub Feed 获取与 XML 解析 | 已完成 |
-| **后端** | Docker Compose (PG + Redis + RSSHub) | 已完成 |
-| **客户端** | pages.json + 底部 TabBar (4 页) | 已完成 |
-| **客户端** | HTTP 请求封装 (Token 拦截器) | 已完成 |
-| **客户端** | TypeScript 类型定义 | 已完成 |
-| **客户端** | API 调用层 (auth/feed/subscription/creator) | 已完成 |
-| **客户端** | Pinia 状态管理 (user/feed/subscription) | 已完成 |
-| **客户端** | 登录页 (手机号 + 验证码) | 已完成 |
-| **客户端** | 首页信息流 (平台 Tab + 下拉刷新 + 上拉加载) | 已完成 |
-| **客户端** | 发现页 (搜索B站UP主 + 一键关注) | 已完成 |
-| **客户端** | 订阅管理页 (关注列表 + 长按取消) | 已完成 |
-| **客户端** | 个人中心页 (用户信息 + 设置 + 退出) | 已完成 |
-| **联调** | 前后端联调 (登录 + 搜索 + 订阅 + 信息流) | 待开始 |
-| **联调** | 微信小程序端适配测试 | 待开始 |
-| **联调** | 短信服务接入 (当前开发模式验证码打印在控制台) | 待开始 |
-| **联调** | TabBar 图标替换 (当前为占位图标) | 待开始 |
+
+| 模块       | 功能                                          | 状态   |
+| ---------- | --------------------------------------------- | ------ |
+| **后端**   | Hono 项目骨架、中间件 (Auth/CORS/Error)       | 已完成 |
+| **后端**   | 数据库 Schema (5 张表) + Drizzle ORM          | 已完成 |
+| **后端**   | 短信验证码登录 / JWT 认证                     | 已完成 |
+| **后端**   | 订阅 CRUD (增/删/查)                          | 已完成 |
+| **后端**   | 信息流查询 (游标分页) + 手动刷新              | 已完成 |
+| **后端**   | 博主搜索 (代理B站 API) + 博主详情             | 已完成 |
+| **后端**   | RSSHub Feed 获取与 XML 解析                   | 已完成 |
+| **后端**   | Docker Compose (PG + Redis + RSSHub)          | 已完成 |
+| **客户端** | pages.json + 底部 TabBar (4 页)               | 已完成 |
+| **客户端** | HTTP 请求封装 (Token 拦截器)                  | 已完成 |
+| **客户端** | TypeScript 类型定义                           | 已完成 |
+| **客户端** | API 调用层 (auth/feed/subscription/creator)   | 已完成 |
+| **客户端** | Pinia 状态管理 (user/feed/subscription)       | 已完成 |
+| **客户端** | 登录页 (手机号 + 验证码)                      | 已完成 |
+| **客户端** | 首页信息流 (平台 Tab + 下拉刷新 + 上拉加载)   | 已完成 |
+| **客户端** | 发现页 (搜索B站UP主 + 一键关注)               | 已完成 |
+| **客户端** | 订阅管理页 (关注列表 + 长按取消)              | 已完成 |
+| **客户端** | 个人中心页 (用户信息 + 设置 + 退出)           | 已完成 |
+| **联调**   | 前后端联调 (登录 + 搜索 + 订阅 + 信息流)      | 待开始 |
+| **联调**   | 微信小程序端适配测试                          | 待开始 |
+| **联调**   | 短信服务接入 (当前开发模式验证码打印在控制台) | 待开始 |
+| **联调**   | TabBar 图标替换 (当前为占位图标)              | 待开始 |
 
 ### 第二阶段 — 体验优化 + 更多平台
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
+
+| 功能       | 说明                 | 状态   |
+| ---------- | -------------------- | ------ |
 | 小红书支持 | 通过 RSSHub 路由接入 | 规划中 |
-| 抖音支持 | 通过 RSSHub 路由接入 | 规划中 |
-| 富文本渲染 | 视频播放、图片轮播 | 规划中 |
-| 离线缓存 | 本地存储已加载条目 | 规划中 |
-| 暗色模式 | 跟随系统 / 手动切换 | 规划中 |
-| 收藏/星标 | 条目标记 + 筛选 | 规划中 |
-| 分组管理 | 订阅按自定义分组归类 | 规划中 |
+| 抖音支持   | 通过 RSSHub 路由接入 | 规划中 |
+| 富文本渲染 | 视频播放、图片轮播   | 规划中 |
+| 离线缓存   | 本地存储已加载条目   | 规划中 |
+| 暗色模式   | 跟随系统 / 手动切换  | 规划中 |
+| 收藏/星标  | 条目标记 + 筛选      | 规划中 |
+| 分组管理   | 订阅按自定义分组归类 | 规划中 |
 
 ### 第三阶段 — 高级功能
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 推送通知 | 博主更新时提醒 | 规划中 |
-| AI 摘要 | 条目内容智能摘要 | 规划中 |
-| OPML 导入导出 | 标准 RSS 订阅迁移 | 规划中 |
-| 一键同步关注 | OAuth 导入各平台关注列表 | 规划中 |
-| 多语言 | i18n 国际化 | 规划中 |
-| 阅读统计 | 周报、阅读习惯分析 | 规划中 |
+
+| 功能          | 说明                     | 状态   |
+| ------------- | ------------------------ | ------ |
+| 推送通知      | 博主更新时提醒           | 规划中 |
+| AI 摘要       | 条目内容智能摘要         | 规划中 |
+| OPML 导入导出 | 标准 RSS 订阅迁移        | 规划中 |
+| 一键同步关注  | OAuth 导入各平台关注列表 | 规划中 |
+| 多语言        | i18n 国际化              | 规划中 |
+| 阅读统计      | 周报、阅读习惯分析       | 规划中 |
 
 ## 参考项目
 
-| 项目 | 路径 | 参考内容 |
-|------|------|----------|
-| **Folo** | `/mnt/c/WORK/SoloFeed/Folo/` | 跨平台 RSS 阅读器的整体架构设计。Monorepo 结构 (apps + packages)、Drizzle ORM 数据库方案、Feed 解析与聚合逻辑、AI 集成方案 |
-| **RSSHub** | `/mnt/c/WORK/SoloFeed/RSSHub/` | 数据抓取与路由体系。B站等平台的路由实现 (lib/routes/bilibili/)、RSS Feed 生成格式、缓存策略、Docker 部署方案 |
-| **RSSHub-Radar** | `/mnt/c/WORK/SoloFeed/RSSHub-Radar/` | 浏览器扩展中的 Feed 发现机制。WXT 框架使用、URL 匹配与 RSS 源检测逻辑 |
+
+| 项目             | 路径                                 | 参考内容                                                                                                                   |
+| ---------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| **Folo**         | `/mnt/c/WORK/SoloFeed/Folo/`         | 跨平台 RSS 阅读器的整体架构设计。Monorepo 结构 (apps + packages)、Drizzle ORM 数据库方案、Feed 解析与聚合逻辑、AI 集成方案 |
+| **RSSHub**       | `/mnt/c/WORK/SoloFeed/RSSHub/`       | 数据抓取与路由体系。B站等平台的路由实现 (lib/routes/bilibili/)、RSS Feed 生成格式、缓存策略、Docker 部署方案               |
+| **RSSHub-Radar** | `/mnt/c/WORK/SoloFeed/RSSHub-Radar/` | 浏览器扩展中的 Feed 发现机制。WXT 框架使用、URL 匹配与 RSS 源检测逻辑                                                      |
 
 ## 注意事项
 
@@ -307,4 +314,4 @@ pnpm dev:mp-weixin
 
 ## License
 
-Private
+MIT License
